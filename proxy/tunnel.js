@@ -1,6 +1,6 @@
-import { net } from "net";
-import { logConnection } from "../logger";
-import { handleFailure } from "../socks5/reply";
+import net from "net";
+import { logConnection } from "../logger.js";
+import { handleFailure } from "../socks5/reply.js";
 
 export function createTunnel(client, host, port) {
   const remote = net.createConnection(port, host, () => {
