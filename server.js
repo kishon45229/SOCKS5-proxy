@@ -4,7 +4,7 @@ import { logMessage } from "./logger.js";
 import { handleHandshake } from "./handshake.js";
 import { handleAuth } from "./auth.js";
 import { handleRequest } from "./socks5/request.js";
-import { log } from "console";
+import { handleSuccess, handleFailure, handleAuthResult } from "./socks5/reply.js";
 
 const server = net.createServer((socket) => {
   logMessage("Client connected");
@@ -26,7 +26,10 @@ const server = net.createServer((socket) => {
         const pass = data.slice(3 + ulen, 3 + ulen + plen).toString();
 
         const ok = handleAuth(user, pass);
-        if (!ok) return client.destroy();
+
+        handleAuthResult(socket, ok);
+
+        if (!ok) return handleFailure(socket);
 
         stage = "request";
         return;
@@ -35,16 +38,19 @@ const server = net.createServer((socket) => {
       if (stage === "request") {
         const { cmd, host, port } = handleRequest(data);
 
-        if (cmd !== 0x01) return client.destroy();
+        if (cmd !== 0x01) return handleFailure(socket);
+
         logMessage(`Request to connect to ${host}:${port}`);
+
+        handleSuccess(socket);
       }
     } catch (error) {
       console.error("Error:", error.message);
-      client.destroy();
+      handleFailure(socket);
     }
   });
 
-  client.on("close", () => {
+  socket.on("close", () => {
     logMessage("Client disconnected");
   });
 });
