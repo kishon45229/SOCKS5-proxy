@@ -1,6 +1,8 @@
 import net from "net";
 import { PORT } from "./config.js";
 import { logMessage } from "./logger.js";
+import { handleHandshake } from "./handshake.js";
+import { handleAuth } from "./auth.js";
 
 const server = net.createServer((socket) => {
   logMessage("Client connected");
@@ -15,7 +17,17 @@ const server = net.createServer((socket) => {
       }
 
       if (stage === "auth") {
-        // authentication logic here
+        const ulen = data[1];
+        const user = data.slice(2, 2 + ulen).toString();
+
+        const plen = data[2 + ulen];
+        const pass = data.slice(3 + ulen, 3 + ulen + plen).toString();
+
+        const ok = handleAuth(user, pass);
+        if (!ok) return client.destroy();
+
+        stage = "request";
+        return;
       }
 
       if (stage === "request") {
