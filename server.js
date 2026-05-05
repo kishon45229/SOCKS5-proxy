@@ -52,7 +52,7 @@ const server = net.createServer((client) => {
         createTunnel(client, host, port);
       }
     } catch (error) {
-      console.error("Error:", error.message);
+      logMessage(`Error: ${error.message}`);
       handleFailure(client);
     }
   });
