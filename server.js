@@ -1,8 +1,9 @@
 import net from "net";
 import { PORT } from "./config.js";
+import { logMessage } from "./logger.js";
 
 const server = net.createServer((socket) => {
-  console.log("Client connected");
+  logMessage("Client connected");
   let stage = "handshake";
 
   socket.on("data", (data) => {
@@ -25,10 +26,10 @@ const server = net.createServer((socket) => {
   });
 
   client.on("close", () => {
-    log("Client disconnected");
+    logMessage("Client disconnected");
   });
 });
 
 server.listen(PORT, () => {
-  log(`SOCKS5 running on port ${PORT}`);
+  logMessage(`SOCKS5 running on port ${PORT}`);
 });
