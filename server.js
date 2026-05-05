@@ -1,7 +1,7 @@
 import net from "net";
 import { PORT } from "./config.js";
 import { logMessage } from "./logger.js";
-import { handleHandshake } from "./handshake.js";
+import { handleHandshake } from "./socks5/handshake.js";
 import { handleAuth } from "./auth.js";
 import { handleRequest } from "./socks5/request.js";
 import {
