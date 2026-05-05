@@ -3,6 +3,8 @@ import { PORT } from "./config.js";
 import { logMessage } from "./logger.js";
 import { handleHandshake } from "./handshake.js";
 import { handleAuth } from "./auth.js";
+import { handleRequest } from "./socks5/request.js";
+import { log } from "console";
 
 const server = net.createServer((socket) => {
   logMessage("Client connected");
@@ -31,7 +33,10 @@ const server = net.createServer((socket) => {
       }
 
       if (stage === "request") {
-        // request handling logic here
+        const { cmd, host, port } = handleRequest(data);
+
+        if (cmd !== 0x01) return client.destroy();
+        logMessage(`Request to connect to ${host}:${port}`);
       }
     } catch (error) {
       console.error("Error:", error.message);
