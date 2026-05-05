@@ -4,16 +4,21 @@ import { logMessage } from "./logger.js";
 import { handleHandshake } from "./handshake.js";
 import { handleAuth } from "./auth.js";
 import { handleRequest } from "./socks5/request.js";
-import { handleSuccess, handleFailure, handleAuthResult } from "./socks5/reply.js";
+import {
+  handleSuccess,
+  handleFailure,
+  handleAuthResult,
+} from "./socks5/reply.js";
+import { createTunnel } from "./proxy/tunnel.js";
 
-const server = net.createServer((socket) => {
+const server = net.createServer((client) => {
   logMessage("Client connected");
   let stage = "handshake";
 
-  socket.on("data", (data) => {
+  client.on("data", (data) => {
     try {
       if (stage === "handshake") {
-        const ok = handleHandshake(data, socket);
+        const ok = handleHandshake(data, client);
         if (ok) stage = "auth";
         return;
       }
@@ -27,9 +32,9 @@ const server = net.createServer((socket) => {
 
         const ok = handleAuth(user, pass);
 
-        handleAuthResult(socket, ok);
+        handleAuthResult(client, ok);
 
-        if (!ok) return handleFailure(socket);
+        if (!ok) return handleFailure(client);
 
         stage = "request";
         return;
@@ -38,19 +43,21 @@ const server = net.createServer((socket) => {
       if (stage === "request") {
         const { cmd, host, port } = handleRequest(data);
 
-        if (cmd !== 0x01) return handleFailure(socket);
+        if (cmd !== 0x01) return handleFailure(client);
 
         logMessage(`Request to connect to ${host}:${port}`);
 
-        handleSuccess(socket);
+        handleSuccess(client);
+
+        createTunnel(client, host, port);
       }
     } catch (error) {
       console.error("Error:", error.message);
-      handleFailure(socket);
+      handleFailure(client);
     }
   });
 
-  socket.on("close", () => {
+  client.on("close", () => {
     logMessage("Client disconnected");
   });
 });
