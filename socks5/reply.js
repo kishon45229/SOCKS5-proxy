@@ -3,7 +3,7 @@ export function handleSuccess(client) {
 }
 
 export function handleFailure(client) {
-  client.write(Buffer.from([0x05, 0x01]));
+  client.write(Buffer.from([0x05, 0x01, 0x00, 0x01, 0, 0, 0, 0, 0, 0]));
   client.destroy();
 }
 
