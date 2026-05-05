@@ -1,4 +1,5 @@
 import net from "net";
+import { PORT } from "./config.js";
 
 const server = net.createServer((socket) => {
   console.log("Client connected");
@@ -28,6 +29,6 @@ const server = net.createServer((socket) => {
   });
 });
 
-server.listen(process.env.PORT, () => {
-  log(`SOCKS5 running on port ${process.env.PORT}`);
+server.listen(PORT, () => {
+  log(`SOCKS5 running on port ${PORT}`);
 });
