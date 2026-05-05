@@ -9,7 +9,9 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     try {
       if (stage === "handshake") {
-        // handshake logic here
+        const ok = handleHandshake(data, socket);
+        if (ok) stage = "auth";
+        return;
       }
 
       if (stage === "auth") {
