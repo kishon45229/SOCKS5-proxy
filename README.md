@@ -32,7 +32,7 @@ SOCKS5 running on port 3000
 ### cURL
 
 ```bash
-curl --socks5-hostname <username>:<password>@127.0.0.1:3000 https://ipinfo.io
+curl --socks5-hostname admin:123456@127.0.0.1:3000 https://example.com
 ```
 
 ### Browser / App
